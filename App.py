@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, create_engine, func, Boolean
-from sqlalchemy.orm import Session, declarative_base
+from sqlalchemy.orm import Session, declarative_base, validates
 
 Base = declarative_base()
 
@@ -12,6 +12,9 @@ class User(Base):
     id = Column(Integer, primary_key = True )
     name = Column(String)
     logged_in = Column(Boolean)  ### Will event be a bool.  does it need to be imported
+    def __repr__(self):
+        return f"{self.name},{self.logged_in}"
+
 
 class Meals(Base):
     __tablename__="Meals"
@@ -28,4 +31,5 @@ if __name__ == '__main__':
             logged_in = 0
         )
         session.add(u1)
-        session.commit()
+        all_users = session.query(User).all()
+        print(all_users)
