@@ -1,26 +1,48 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
-from sqlalchemy.orm import sessionmaker, relationship, declarative_base, validates
-from sqlalchemy.exc import IntegrityError
+import datetime
+from sqlalchemy import Column, Integer, String, Date, Time, Float, ForeignKey, Table, create_engine
+from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 
 Base = declarative_base()
 
+meal_food_association = Table(
+    "meal_food_association",
+    Base.metadata,
+    Column("meal_id", Integer, ForeignKey("meals.id")),
+    Column("food_id", Integer, ForeignKey("foods.id"))
+)
+
 class User(Base):
-    __tablename__ = 'Users'
+    __tablename__ = "users"
+
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False )
-    user_name = Column(String, nullable=False )
-    password  =Column(String, nullable=False )
-    email = Column(String, nullable=False )
-    tier = Column(Integer, nullable=False)
+    name = Column(String)
+    user_name = Column(String, unique=True)
+    password = Column(String)
+    email = Column(String, unique=True)
+    tier = Column(String)
+    meals = relationship("Meal", back_populates="user")
 
-    ####relationships 4858
-    ###validates at 5427 to 10609
-    ##113 = CRUD
-#class Meals(Base):
- #   pass
+class Meal(Base):
+    __tablename__ = "meals"
 
-#class Foods(Base):
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    date = Column(Date)
+    time = Column(Time)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user = relationship("User", back_populates="meals")
+
+    foods = relationship("Food", secondary=meal_food_association, back_populates="meals")
+
+class Food(Base):
+    __tablename__ = "foods"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    daily_percent = Column(Float)
+    meals = relationship("Meal", secondary=meal_food_association, back_populates="foods")
     
     def __repr__(self):
         return f"{self.name}: user_name {self.user_name}"
@@ -29,7 +51,12 @@ if __name__ == "__main__":
 
     
     engine = create_engine('sqlite:///planner.db')
+
     Base.metadata.create_all(engine)
+    #User.__table__.drop(engine)
+    #Meal.__table__.drop(engine)
+    #Food.__table__.drop(engine)
+
 
     Session = sessionmaker(bind=engine)
     session = Session()
@@ -37,14 +64,40 @@ if __name__ == "__main__":
     print("\n") 
     print("Welcome to Meal Planner")
 
+    def create_meal():
+        in_create_meal = True
+        while in_create_meal:
+            name = input("What would you like to name this meal?: ")
+            year = input("Please enter the year this meal will be eaten: ")
+            month = input("Please enter the month of the meal in a number format: ")
+            day = input("Please enter the day of the month: ")
+            hour = input("Input the hour of day in military time ie. 23 = 11 pm: ")
+            minute = input("Please enter the number of minutes past the hour ie. 45 for 8:45: ")
+            
+            int_year = int(year)
+            int_month =int(month)
+            int_day = int(day)
+            int_hour = int(hour)
+            int_minute = int(minute)
+
+
+
+            date = (datetime.datetime(int_year, int_month, int_day) - datetime.datetime(2024,1,1)).days + 1
+            time = ((int_hour * 60)+ int_minute)
+            
+            print("Would you like to make another meal?: ")
+            user_input = input("Enter Y for yes or N for no: ")
+            if user_input == 'N':
+                in_create_meal = False
+
     def user_list(id_of_logged_in_user, tier_of_logged_in_user):
         print("userlist")
         users = session.query(User).all()
         for user in users:
             print(f"ID:{user.id}, Name: {user.name}, Email:{user.email}")
-        if tier_of_logged_in_user == 2:
+        if tier_of_logged_in_user == '2':
             halt = input("Hit Enter to Continue")
-        elif tier_of_logged_in_user == 3:
+        elif tier_of_logged_in_user == '3':
             in_mod = True
             while in_mod == True:
                 print("Would you like to update a user?:")
@@ -119,17 +172,14 @@ if __name__ == "__main__":
 
 
     def logged_in(id_of_logged_in_user, tier_of_logged_in_user):
-        print(tier_of_logged_in_user)
 
         logged_in = True
         while logged_in == True:
-            print(id_of_logged_in_user)
-            print(tier_of_logged_in_user)
             print("Please make your selection: ")
             print("   Enter 1 to create a meal: ")
             print("   Enter 2 to update your information: ")
             print("   Enter 3 to log out: ")
-            if tier_of_logged_in_user != 1:
+            if int(tier_of_logged_in_user) > 1:
                 print("    Enter 4 to see list of users: ")
 
             user_input = input(":")
@@ -141,7 +191,7 @@ if __name__ == "__main__":
                 update_info(id_of_logged_in_user, tier_of_logged_in_user)
             elif user_input == '1':
                 create_meal()
-            elif user_input == '4' and tier_of_logged_in_user>1:
+            elif int(user_input == '4' and tier_of_logged_in_user)>1:
                 user_list(id_of_logged_in_user, tier_of_logged_in_user)
             else:
                 print("please enter a valid input of either 1, 2, or 3.")
@@ -169,7 +219,7 @@ if __name__ == "__main__":
         while at_loggin == True:
             print("\n")
             user_name = input("please enter your user name to login:")
-            password = input("Please enter your password")
+            password = input("Please enter your password: ")
 
       
 
