@@ -29,9 +29,9 @@ class Meal(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    date = Column(Date)
-    time = Column(Time)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    date = Column(Integer)
+    time = Column(Integer)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     user = relationship("User", back_populates="meals")
 
     foods = relationship("Food", secondary=meal_food_association, back_populates="meals")
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     print("\n") 
     print("Welcome to Meal Planner")
 
-    def create_meal():
+    def create_meal(id_of_logged_in_user):
         in_create_meal = True
         while in_create_meal:
             name = input("What would you like to name this meal?: ")
@@ -84,6 +84,14 @@ if __name__ == "__main__":
 
             date = (datetime.datetime(int_year, int_month, int_day) - datetime.datetime(2024,1,1)).days + 1
             time = ((int_hour * 60)+ int_minute)
+
+
+            new_meal = Meal(name=name, date=date, time=time, user_id = 5 )
+            session.add(new_meal)
+            session.commit()
+
+
+
             
             print("Would you like to make another meal?: ")
             user_input = input("Enter Y for yes or N for no: ")
@@ -190,7 +198,7 @@ if __name__ == "__main__":
             elif user_input == '2':
                 update_info(id_of_logged_in_user, tier_of_logged_in_user)
             elif user_input == '1':
-                create_meal()
+                create_meal(id_of_logged_in_user)
             elif int(user_input == '4' and tier_of_logged_in_user)>1:
                 user_list(id_of_logged_in_user, tier_of_logged_in_user)
             else:
