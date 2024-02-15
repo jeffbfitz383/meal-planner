@@ -64,6 +64,28 @@ if __name__ == "__main__":
     print("\n") 
     print("Welcome to Meal Planner")
 
+    def create_food(id_of_logged_in_user, tier_of_logged_in_user):
+        name = input("Please enter the name of the food you would like to add: ")
+
+        new_food = Food(name=name, daily_percent = 5)
+        session.add(new_food)
+        session.commit()
+
+
+
+
+
+
+    def update_food(id_of_logged_in_user, tier_of_logged_in_user):
+        print("Please make a selection")
+        print("Enter 1 to create a food:")
+        print("\n")
+        selection = input(":")
+
+        if selection == '1':
+            create_food(id_of_logged_in_user, tier_of_logged_in_user)
+
+
     def create_meal(id_of_logged_in_user):
         in_create_meal = True
         while in_create_meal:
@@ -85,8 +107,23 @@ if __name__ == "__main__":
             date = (datetime.datetime(int_year, int_month, int_day) - datetime.datetime(2024,1,1)).days + 1
             time = ((int_hour * 60)+ int_minute)
 
+            print("Please include the number of the food for the first food in your meal. :")
+            query = session.query(Food).all()
+            for record in query:
+                print(f"{record.id}: Name: {record.name}, daily percent: {record.daily_percent}")
+            #food_input = input(": ")
+            food_input = '2'
+            print(food_input)
+            #next_food = Food
+              
+            #
+
+            
+
 
             new_meal = Meal(name=name, date=date, time=time, user_id = 5 )
+            new_meal.foods.append(food_input)
+            print(new_meal)
             session.add(new_meal)
             session.commit()
 
@@ -188,7 +225,9 @@ if __name__ == "__main__":
             print("   Enter 2 to update your information: ")
             print("   Enter 3 to log out: ")
             if int(tier_of_logged_in_user) > 1:
-                print("    Enter 4 to see list of users: ")
+                print("   Enter 4 to see a list of users: ")
+            if int(tier_of_logged_in_user) > 2:
+                print( "   Enter 5 to modify a food: ")
 
             user_input = input(":")
             if int(user_input) == 3:
@@ -201,6 +240,8 @@ if __name__ == "__main__":
                 create_meal(id_of_logged_in_user)
             elif int(user_input == '4' and tier_of_logged_in_user)>1:
                 user_list(id_of_logged_in_user, tier_of_logged_in_user)
+            elif int(user_input == '5' and tier_of_logged_in_user)>2:
+                update_food(id_of_logged_in_user, tier_of_logged_in_user)
             else:
                 print("please enter a valid input of either 1, 2, or 3.")
 
