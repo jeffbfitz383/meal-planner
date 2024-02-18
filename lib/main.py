@@ -66,9 +66,27 @@ if __name__ == "__main__":
     #session.add_all([breakfast, lunch, dinner])
     #session.commit()
 #to do print
-    meals = session.query(Meal).all()
-    for meal in meals:
-        print(f"{meal.name} - User: {meal.user.name}")
+   # meals = session.query(Meal).all()
+   # for meal in meals:
+   #     print(f"{meal.name} - User: {meal.user.name}")
 
-##Todo test relationships
+
 ##Todo main Cli
+
+    def goodbye():
+        print("Thank you for visiting Meal Planner!")
+        print("See you next time! :) ")
+
+
+    def main():
+        print("Hello meal-planner")
+        in_main = True
+        while in_main == True:
+            user_input = input(":")
+            if user_input == "3":
+                in_main = False
+                goodbye()
+
+    main()
+
+####end todo cli######
