@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
 from sqlalchemy.orm import Session, declarative_base, relationship, sessionmaker, validates
 
+
 Base = declarative_base()
 
 class User(Base):
@@ -13,7 +14,41 @@ class User(Base):
     tier = Column(Integer, nullable=False)
     meals = relationship("Meal", back_populates="user")
 
-    ##TODO validations
+    @validates('name')
+    def validate_name(self, key, value):
+        if type(value) is str and 2<= len(value):
+            return value
+        else: ValueError("Names must be in a text format and contain atleast 2 characters.")
+
+    @validates('email')
+    def validate_email(self, key, value):
+        if type(value) is str and "@" in value and 6<= len(value):
+            return value
+        else: ValueError("emails must be at least 6 caracters and include a '@'. ")
+
+    @validates('user_name')
+    def validate_user_name(self, key, value):
+        if type(value) is str and 4<= len(value):
+            return value
+        else: ValueError("a username must be of type text and contain at least 4 characters")
+
+    @validates('password')
+    def validate_password(self, key, value):
+        if type(value) is str and 8<= len(value):
+            return value
+        else: ValueError("passwords must be at least 8 characters in length")
+
+    @validates('tier')
+    def validate_tier(self, key, value):
+        if type(value) is int and 1<= value <=3:
+            return value
+        else: ValueError("A tier must either be 1, 2, or 3")
+            
+
+    
+
+
+    ##TODO complete validations
 
 class Meal(Base):
     __tablename__ = "meals"
@@ -88,9 +123,27 @@ if __name__ == "__main__":
 
 
 
+
     def new_user():
-        pass
-        #TODO add functionality
+        name_loop =True
+        while name_loop == True:
+            name = input("Please enter your name: ")
+            if type(name) is str and 2<= len(name):        #class method validation is also present but I could figure out a way to maintain the loop.
+                name_loop = False
+            else:
+                 print("A name must be a least 2 characters and in text form ")
+        email = input("Please enter your email address: ")
+        user_name = input("Please enter your username: ")
+        password = input("Please enter your password: ")
+
+        new_user = User(name=name, user_name=user_name, password=password, email=email, tier=1 )
+        session.add(new_user)
+        session.commit()
+
+        print(f"Congratulations {name} on becoming a part of the Meal Planner Family!\n")
+
+
+        #TODO complete validations for user.
 
 
 
