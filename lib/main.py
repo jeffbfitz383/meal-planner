@@ -38,6 +38,19 @@ class Food(Base):
 
     #todo validations
 
+if __name__ == "__main__":
+
+    
+    engine = create_engine('sqlite:///planner.db')
+
+    Base.metadata.create_all(engine)
+    # User.__table__.drop(engine)
+    # Meal.__table__.drop(engine)
+    # Food.__table__.drop(engine)
+
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
 
 ##Todo test relationships
 ##Todo main Cli
