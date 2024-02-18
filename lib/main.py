@@ -132,9 +132,30 @@ if __name__ == "__main__":
                 name_loop = False
             else:
                  print("A name must be a least 2 characters and in text form ")
-        email = input("Please enter your email address: ")
-        user_name = input("Please enter your username: ")
-        password = input("Please enter your password: ")
+        
+        email_loop=True
+        while email_loop == True:
+            email = input("Please enter your email address: ")
+            if type(email) is str and "@" in email and 6<= len(email):
+                email_loop = False
+            else:
+                print("please enter a valid email address")
+
+        user_name_loop=True
+        while user_name_loop == True:
+            user_name = input("Please enter your username: ")
+            if type(user_name) is str and 4<= len(user_name):
+                user_name_loop = False
+            else:
+                print("a user name must be atleast 4 characters.")
+
+        password_loop = True
+        while password_loop == True:
+            password = input("Please enter your password: ")
+            if type(password) is str and 8<= len(password):
+                password_loop = False
+            else:
+                print("passwords must be atleast 8 characters")
 
         new_user = User(name=name, user_name=user_name, password=password, email=email, tier=1 )
         session.add(new_user)
