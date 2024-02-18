@@ -23,7 +23,7 @@ class Meal(Base):
     time = Column(Integer, nullable=False)
     foods = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'))
-    users = relationship("User", back_populates="meal")
+    user = relationship("User", back_populates="meals")
 
     #todo validations
     
@@ -47,10 +47,28 @@ if __name__ == "__main__":
     Session = sessionmaker(bind=engine)
     session = Session()
 
+    #Owen =User(name = "Owen", email = "Owen@Minecraft.com", user_name = "1", password = "1", tier = 3)
+    
+   # Riley =User(name = "Riley", email = "Riley@bb.com", user_name = "1", password = "1", tier = 3)
+    #session.add(Owen)
+   # session.commit()
 
-#create a user
-#create a meal
-#print
+   
+
+#to do create a 
+
+#####end to create meal ################
+
+    #brunch = Meal(name= "Brunch", date =50, time =50, foods = "bread", user_id = 2 )
+    #breakfast = Meal(name= "Breakfast", date =50, time =50, foods = "eggs", user_id = 1 )
+    #lunch = Meal(name= "Lunch", date =50, time =50, foods = "cheese", user_id = 1 )
+    #dinner = Meal(name= "Dinner", date =50, time =50, foods = "meat", user_id = 1 )
+    #session.add_all([breakfast, lunch, dinner])
+    #session.commit()
+#to do print
+    meals = session.query(Meal).all()
+    for meal in meals:
+        print(f"{meal.name} - User: {meal.user.name}")
 
 ##Todo test relationships
 ##Todo main Cli
