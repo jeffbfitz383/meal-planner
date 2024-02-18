@@ -13,7 +13,7 @@ class User(Base):
     tier = Column(Integer, nullable=False)
     meals = relationship("Meal", back_populates="user")
 
-    ##todo validations
+    ##TODO validations
 
 class Meal(Base):
     __tablename__ = "meals"
@@ -25,7 +25,7 @@ class Meal(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship("User", back_populates="meals")
 
-    #todo validations
+    #TODO validations
     
     
 
@@ -36,7 +36,7 @@ class Food(Base):
     precent_protein = Column(Integer, nullable=False)
     percent_calcium =Column(Integer, nullable=False)
 
-    #todo validations
+    #TODO validations
 
 if __name__ == "__main__":
     engine = create_engine('sqlite:///planner.db')
@@ -71,22 +71,64 @@ if __name__ == "__main__":
    #     print(f"{meal.name} - User: {meal.user.name}")
 
 
-##Todo main Cli
 
-    def goodbye():
+
+#TODO Meal table CRUD functions
+#TODO Food table CRUD functions
+
+
+##############Beginning of User Table CRUD functions##################
+#TODO logged in screen
+
+#TODO log in screen start
+    def log_in():
+        pass
+        #TODO add functinality
+#TODO log in screen end
+
+
+
+    def new_user():
+        pass
+        #TODO add functionality
+
+
+
+
+##############End of User Table CRUD funcions#########################
+
+
+
+#############beginning of main menu fuctions#############
+
+    def print_main():
+        
+        print("Press 1 to create and account.")
+        print("press 2 to log in.")
+        print("press 3 to exit\n")
+
+    def goodbye_main():
         print("Thank you for visiting Meal Planner!")
-        print("See you next time! :) ")
+        print("See you next time! :) \n")
 
 
     def main():
-        print("Hello meal-planner")
+        print("Welcome to Meal Planner.\n")
         in_main = True
         while in_main == True:
+            print_main()
             user_input = input(":")
             if user_input == "3":
                 in_main = False
-                goodbye()
+                goodbye_main()
+            elif user_input == "2":
+                log_in()
+            elif user_input == "1":
+                new_user()
+            else:
+                print("invalid input. Please select an input from the menu.\n")
+                print("Main Menu\n")
+############### end main menu functions  #################
 
     main()
 
-####end todo cli######
