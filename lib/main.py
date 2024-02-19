@@ -241,6 +241,71 @@ if __name__ == "__main__":
                 return food.percent_calcium
 
         
+    def update_meal(id_of_logged_in_user, tier_of_logged_in_user):
+        see_meals(id_of_logged_in_user, tier_of_logged_in_user)
+        print("Enter the id# of the meal you want to update. ")
+        user_input = input(": ")
+        for meal in session.query(Meal):
+            if meal.id == int(user_input):
+                print("You will be prompted to update each value in the above meal")
+                print("Please Enter the new value")
+                print("If the value is to remane the same re-enter the original value")
+                new_name = input("What is the new name of the meal: ")
+                year= input("Please enter the correct year: ")
+                month = input("Please enter the correct month:")
+                day = input("Please enter the correct day")
+                hour = input("Please enter the correct hour in military time:")
+                minute = input("Please enter minutes past the hour: ") 
+
+
+                int_year = int(year)
+                int_month =int(month)
+                int_day = int(day)
+                int_hour = int(hour)
+                int_minute = int(minute)
+                
+                date = (datetime.datetime(int_year, int_month, int_day) - datetime.datetime(1970,1,1)).days + 1
+                time = ((int_hour * 60)+ int_minute)
+
+                meal.name = new_name
+                meal.date = date
+                meal.time = time
+
+                all = []
+                for meal in session.query(Meal):
+                    if meal.id == int(user_input):
+                        for food in meal.foods:
+                            all.append(food.name)
+                print(all)
+
+                food_to_remove = input("please enter the food to remove or hit enter to skip:")
+                meal.foods = [food for food in meal.foods if food.name != food_to_remove]
+
+                foods = session.query(Food).all()
+                for food in foods:
+                    print(f"ID: {food.id}, Name: {food.name}, % daily protein: {food.percent_protein}% daily Calcium: {food.percent_calcium}")
+
+                add_choice =input("would you like to add any of these foods? Hit Y for yes on any other key for no: ")
+                if add_choice == 'Y':
+
+                    food_to_add = input("please enter the id of the food you would like to add or hit enter to skip: ")
+                    food = session.query(Food).filter_by(id=food_to_add).first()
+                    meal.foods.append(food)
+
+
+                
+
+                
+
+
+        session.commit()
+
+
+
+
+
+
+
     def create_meal(id_of_logged_in_user, tier_of_logged_in_user):
         print("you are creating a meal")
 
@@ -556,6 +621,7 @@ if __name__ == "__main__":
             print(" Enter 6 to delete a meal: ")
             if tier_of_logged_in_user >1:
                 print(" Enter 7 to view users")
+            print("  Enter 8 to update meal")
 
             user_input = input(": ")
             print("\n")
@@ -577,7 +643,8 @@ if __name__ == "__main__":
                 delete_meal(id_of_logged_in_user, tier_of_logged_in_user)
             elif user_input == '7' and tier_of_logged_in_user >1:
                 view_users(id_of_logged_in_user, tier_of_logged_in_user)
-
+            elif user_input == '8':
+                update_meal(id_of_logged_in_user, tier_of_logged_in_user)
             
 
 
