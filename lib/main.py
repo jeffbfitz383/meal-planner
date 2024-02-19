@@ -102,11 +102,25 @@ if __name__ == "__main__":
    
 
 ##############start of create meals CRUD functions#############
+    
 
     def see_foods():
         foods = session.query(Food).all()
         for food in foods:
             print(f"ID: {food.id}, Name: {food.name}, % daily protein: {food.percent_protein}% daily Calcium: {food.percent_calcium}")
+
+    def sort_foods(greatest_deficiency, id_of_logged_in_user):
+        foods = session.query(Food).all()
+        if greatest_deficiency == 1:
+            sorted_foods_descending = sorted(foods, key=lambda x: x.percent_calcium, reverse=True)
+            for food in sorted_foods_descending:
+                print(f"ID: {food.id}, Name: {food.name}, % daily protein: {food.percent_protein}% daily Calcium: {food.percent_calcium}")
+        elif greatest_deficiency == 2:
+            sorted_foods_descending = sorted(foods, key=lambda x: x.percent_protein, reverse=True)
+            for food in sorted_foods_descending:
+                print(f"ID: {food.id}, Name: {food.name}, % daily protein: {food.percent_protein}% daily Calcium: {food.percent_calcium}")
+
+
 
     def unpack_meals(meal_id):
         all = []
@@ -153,6 +167,29 @@ if __name__ == "__main__":
             print(f"ID: {meal.id}, Meal name: {meal.name}, Date: {date}, Time: {hour}:{minute} {half_time}, Meals: ({meals_unpacked})")
             #TODO complete
 
+    def delete_meal(id_of_logged_in_user, tier_of_logged_in_user):
+
+        print("Enter the ID# of the meal you would like to delete")
+        see_meals(id_of_logged_in_user, tier_of_logged_in_user)
+        print("\n")
+        user_input = input(": ")
+        meals = session.query(Meal).all()
+        for meal in meals:
+            if meal.id == int(user_input):
+                session.delete(meal)
+        session.commit()
+
+    def add_protein(int_food):
+        foods = session.query(Food).all()
+        for food in foods:
+            if food.id == int_food:
+                return food.percent_protein
+
+    def add_calcium(int_food):
+        foods = session.query(Food).all()
+        for food in foods:
+            if food.id == int_food:
+                return food.percent_calcium
 
         
     def create_meal(id_of_logged_in_user, tier_of_logged_in_user):
@@ -179,20 +216,41 @@ if __name__ == "__main__":
             new_meal = Meal(name=name, date=date, time=time, user_id = id_of_logged_in_user)
             session.add(new_meal)
             food_loop = True
+            one_pass = False
+            total_protein = 0
+            total_calcium = 0
+            greatest_deficiency = 0
             while food_loop == True:
+                
                 print("press 1 to add a food to your meal")
                 print("Press 2 to submit meal")
                 user_input = input(": ")
                 if user_input == '2':
                     food_loop = False
                 else:
-                    see_foods()
+                    if one_pass == False:
+                        see_foods()
+                    elif one_pass == True:
+                        print("not first pass")
+                        sort_foods(greatest_deficiency, id_of_logged_in_user)
                     print("Please enter the item # of the food you would like to add: ")
                     food_input = input(": ")
                     int_food = int(food_input)
                     new_food = session.get(Food, int_food)
                     new_meal.foods.append(new_food)
                     session.commit()
+                    added_protein = add_protein(int_food)
+                    total_protein = total_protein + added_protein
+                    added_calcium = add_calcium(int_food)
+                    total_calcium = total_calcium + added_calcium
+                    if total_protein > total_calcium:
+                        greatest_deficiency = 1
+                    else:
+                        greatest_deficiency = 2
+                    print(greatest_deficiency)
+                    #add_calcium()
+                one_pass = True
+                print(one_pass)
                     
 
 
@@ -202,13 +260,13 @@ if __name__ == "__main__":
             #new_meal.foods.append(food)
             #session.commit()
 
-            print(f"{date}, {time}")
-            meal = session.get(Meal, 2)
+            #print(f"{date}, {time}")
+            #meal = session.get(Meal, 2)
 
-            food_names = [food.name for food in meal.foods]
-            print(food_names[0])
+            #food_names = [food.name for food in meal.foods]
+            #print(food_names[0])
 
-            in_create_meal = False
+                in_create_meal = False
             
 
 #####end to create meal ################
@@ -390,9 +448,11 @@ if __name__ == "__main__":
             print("  Enter 1 to log out: ")
             print("  Enteer 2 to update info")
             print("  Enter 3 to see your meals")
-            print("  Enter 4 to creat a new meal")
+            print("  Enter 4 to create a new meal")
             if tier_of_logged_in_user == 3:
                 print("  Enter 5 to update food: ")
+            print(" Enter 6 to delete a meal: ")
+
             user_input = input(": ")
 
             if user_input == "1":
@@ -407,6 +467,9 @@ if __name__ == "__main__":
             
             elif user_input == '5' and tier_of_logged_in_user ==3:
                 update_foods(id_of_logged_in_user, tier_of_logged_in_user)
+
+            elif user_input == '6':
+                delete_meal(id_of_logged_in_user, tier_of_logged_in_user)
             
 
 
