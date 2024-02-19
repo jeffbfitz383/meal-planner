@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
+import datetime
+from sqlalchemy import Column, Integer, String, ForeignKey, create_engine, Table, Date, Time
 from sqlalchemy.orm import Session, declarative_base, relationship, sessionmaker, validates
 
 
@@ -50,15 +51,23 @@ class User(Base):
 
     ##TODO complete validations
 
+
+meal_food_table = Table('meal_food', Base.metadata,
+    Column('meal_id', Integer, ForeignKey('meals.id'), primary_key=True),
+    Column('food_id', Integer, ForeignKey('foods.id'), primary_key=True)
+)
+
 class Meal(Base):
     __tablename__ = "meals"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     date = Column(Integer, nullable=False)
     time = Column(Integer, nullable=False)
-    foods = Column(String, nullable=False)
+    foods = relationship("Food", secondary=meal_food_table, back_populates="meals")
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship("User", back_populates="meals")
+
+
 
     #TODO validations
     
@@ -68,8 +77,10 @@ class Food(Base):
     __tablename__ = "foods"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    precent_protein = Column(Integer, nullable=False)
+    percent_protein = Column(Integer, nullable=False)
     percent_calcium =Column(Integer, nullable=False)
+    meals = relationship("Meal", secondary=meal_food_table, back_populates="foods")
+    meal_id = Column(Integer, ForeignKey('meals.id'))
 
     #TODO validations
 
@@ -90,7 +101,97 @@ if __name__ == "__main__":
 
    
 
-#to do create a 
+##############start of create meals CRUD functions#############
+    def unpack_meals(meal_id):
+        all = []
+        meals = session.query(Meal).all()
+        for meal in meals:
+            if meal.id == meal_id:
+                print(f"meal pulled is{meal.name}")
+
+    def unpack_date(date):
+        days_since_epoch = 19773
+        epoch_date = datetime.datetime(1970, 1, 1)
+        target_date = epoch_date + datetime.timedelta(days=days_since_epoch)
+        formatted_date = target_date.strftime('%Y-%m-%d')
+        return formatted_date
+        
+
+    def see_meals(id_of_logged_in_user, tier_of_logged_in_user):
+        users = session.query(User).all()
+        for user in users:
+            if user.id == id_of_logged_in_user:
+
+                print(f"Showing meals for user {user.name}")
+        meals = session.query(Meal).all()
+        
+        for meal in meals:
+
+            if meal.user.id == id_of_logged_in_user:
+                date = unpack_date(meal.date)
+                hour = int(meal.time/60)
+                minute =(meal.time%60)
+                meals =unpack_meals(meal.id)
+             
+            print(f"ID: {meal.id}, Meal name: {meal.name}, Date: {date}, Time: {hour}:{minute}")
+            #TODO complete
+
+
+        
+    def create_meal(id_of_logged_in_user, tier_of_logged_in_user):
+        print("you are creating a meal")
+
+        in_create_meal = True
+        while in_create_meal:
+            name = input("What would you like to name this meal?: ")
+            year = input("Please enter the year this meal will be eaten: ")
+            month = input("Please enter the month of the meal in a number format: ")
+            day = input("Please enter the day of the month: ")
+            hour = input("Input the hour of day in military time ie. 23 = 11 pm: ")
+            minute = input("Please enter the number of minutes past the hour ie. 45 for 8:45: ")
+            
+            int_year = int(year)
+            int_month =int(month)
+            int_day = int(day)
+            int_hour = int(hour)
+            int_minute = int(minute)
+
+            date = (datetime.datetime(int_year, int_month, int_day) - datetime.datetime(1970,1,1)).days + 1
+            time = ((int_hour * 60)+ int_minute)
+
+            new_meal = Meal(name=name, date=date, time=time, user_id = id_of_logged_in_user)
+            session.add(new_meal)
+            food_loop = True
+            while food_loop == True:
+                print("press 1 to add a food to your meal")
+                print("Press 2 to submit meal")
+                user_input = input(": ")
+                if user_input == '2':
+                    food_loop = False
+                else:
+                    print("Please enter the item # of the food you would like to add: ")
+                    food_input = input(": ")
+                    int_food = int(food_input)
+                    new_food = session.get(Food, int_food)
+                    new_meal.foods.append(new_food)
+                    session.commit()
+                    
+
+
+
+            
+            #food = session.get(Food, 1)
+            #new_meal.foods.append(food)
+            #session.commit()
+
+            print(f"{date}, {time}")
+            meal = session.get(Meal, 2)
+
+            food_names = [food.name for food in meal.foods]
+            print(food_names[0])
+
+            in_create_meal = False
+            
 
 #####end to create meal ################
 
@@ -109,17 +210,64 @@ if __name__ == "__main__":
 
 
 #TODO Meal table CRUD functions
-#TODO Food table CRUD functions
+###############Beginning of Food Crud functions################
 
 
+    def create_new_food():
+        name_loop = True
+        while name_loop == True:
+            name = input("What is the name of the new food: ")
+            if type(name) is str and 1<= len(name):
+                name_loop = False
+            else:
+                print("food names must be in text form and be at least 1 character in length")
+
+        protein_loop = True
+        while protein_loop ==True:
+            protein = int(input("Enter the percent dailey protein allowance for one serving"))
+            if type(protein) is int and 0<= protein <=100:
+                protein_loop = False
+            else:
+                print("Protein percentages must be a whole # between 0 and 100")
+
+        ca_loop = True
+        while ca_loop ==True:
+            calcium = int(input("Enter the percent dailey calcium allowance for one serving"))
+            if type(calcium) is int and 0<= calcium <=100:
+                ca_loop = False
+            else:
+                print("Calcium percentages must be a whole # between 0 and 100")
+
+        new_food = Food(name=name, percent_protein=protein, percent_calcium=calcium)
+        session.add(new_food)
+        session.commit()
+
+
+    def update_foods(id_of_logged_in_user, tier_of_logged_in_user):
+
+        in_update_foods = True
+        while in_update_foods == True:
+
+            print("  Enter 1 to go back to previous menu: ")
+            print("  Enter 2 to create a new food")
+
+
+            user_input = input(": ")
+            if user_input == '1':
+                in_update_foods =False
+            if user_input == '2':
+                create_new_food()
+
+ #TODO see foods
+ #TODO update food info
+ #TODO delet food
+
+
+
+###############End of food Crud functions#############################
 ##############Beginning of User Table CRUD functions##################
     
-    def see_meals(id_of_logged_in_user, tier_of_logged_in_user):
-        meals = session.query(Meal).all()
-        for meal in meals:
-            if meal.user.id == id_of_logged_in_user:
-             print(f"{meal.user.name}, {meal.name}")
-            #TODO complete
+
     
 
     
@@ -200,9 +348,7 @@ if __name__ == "__main__":
 
         
 
-        if user_input == '3':
-            update_user_name(id_of_logged_in_user, tier_of_logged_in_user)
-
+        
     def logged_in(id_of_logged_in_user, tier_of_logged_in_user):
         
         logged_in_status = True
@@ -210,7 +356,11 @@ if __name__ == "__main__":
             print("  Enter 1 to log out: ")
             print("  Enteer 2 to update info")
             print("  Enter 3 to see your meals")
+            print("  Enter 4 to creat a new meal")
+            if tier_of_logged_in_user == 3:
+                print("  Enter 5 to update food: ")
             user_input = input(": ")
+
             if user_input == "1":
                 print("come back and see us soon!")
                 logged_in_status = False
@@ -218,12 +368,19 @@ if __name__ == "__main__":
                 update_user(id_of_logged_in_user, tier_of_logged_in_user)
             elif user_input == "3":
                 see_meals(id_of_logged_in_user, tier_of_logged_in_user)
+            elif user_input == '4':
+                create_meal(id_of_logged_in_user, tier_of_logged_in_user)
+            
+            elif user_input == '5' and tier_of_logged_in_user ==3:
+                update_foods(id_of_logged_in_user, tier_of_logged_in_user)
+            
 
 
         
-        #TODO update personal info
-        #TODO see meals
-        #TODO create meals
+
+  
+
+        #TODO create meals -add exended deliverables
 
         #TODO update food for admin
         #TODO update users for owner
@@ -289,7 +446,7 @@ if __name__ == "__main__":
             else:
                 print("passwords must be atleast 8 characters")
 
-        new_user = User(name=name, user_name=user_name, password=password, email=email, tier=1 )
+        new_user = User(name=name, user_name=user_name, password=password, email=email, tier=3 )
         session.add(new_user)
         session.commit()
 
