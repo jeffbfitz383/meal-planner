@@ -336,7 +336,43 @@ if __name__ == "__main__":
 
 
 #TODO Meal table CRUD functions
-###############Beginning of Food Crud functions################
+###############Beginning of Food crud functions################
+    def change_calcium():
+        see_foods()
+        print("\n")
+        user_input= input("Please select the id of the food you would like to update")
+        int_id = int(user_input)
+        for food in session.query(Food):
+            if food.id == int_id:
+                new_calcium = input("What is the correct daily calcium allowance")
+                food.percent_calcium = int(new_calcium)
+        session.commit()
+
+
+    def change_protein():
+        see_foods()
+        print("\n")
+        user_input= input("Please select the id of the food you would like to update")
+        int_id = int(user_input)
+        for food in session.query(Food):
+            if food.id == int_id:
+                new_protein = input("What is the correct daily protein allowance")
+                food.percent_protein = int(new_protein)
+        session.commit()
+
+    def change_food_name():
+        see_foods()
+        print("\n")
+        user_input= input("Please select the id of the food you would like to rename")
+        int_id = int(user_input)
+
+        for food in session.query(Food):
+            if food.id == int_id:
+                new_name_input = input("What would you like the new name to be?: ")
+                food.name = new_name_input
+        session.commit()  
+
+
 
     def delete_food():
         see_foods()
@@ -389,7 +425,10 @@ if __name__ == "__main__":
 
             print("  Enter 1 to go back to previous menu: ")
             print("  Enter 2 to create a new food: ") 
-            print("  Enter 4 to delte a food: ")
+            print("  Enter 3 to update food name: ")
+            print("  Enter 4 to update protein content: ")
+            print("  Enter 5 to update calcium content: ")
+            print("  Enter 6 to delete a food: ")
 
 
             user_input = input(": ")
@@ -397,8 +436,16 @@ if __name__ == "__main__":
                 in_update_foods =False
             elif user_input == '2':
                 create_new_food()
-            elif user_input == '4':
+            elif user_input =='3':
+                change_food_name()
+            elif user_input =='4':
+                change_protein()
+            elif user_input =='5':
+                change_calcium()
+            elif user_input == '6':
                 delete_food()
+            else:
+                print("enter valid input: ")
 
 
  #TODO update food info
