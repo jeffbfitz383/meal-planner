@@ -104,10 +104,14 @@ if __name__ == "__main__":
 ##############start of create meals CRUD functions#############
     def unpack_meals(meal_id):
         all = []
+
         meals = session.query(Meal).all()
         for meal in meals:
             if meal.id == meal_id:
-                print(f"meal pulled is{meal.name}")
+                for food in meal.foods:
+                    all.append(food.name)
+        comma_separated_string = ", ".join(all)
+        return comma_separated_string
 
     def unpack_date(date):
         days_since_epoch = 19773
@@ -131,9 +135,16 @@ if __name__ == "__main__":
                 date = unpack_date(meal.date)
                 hour = int(meal.time/60)
                 minute =(meal.time%60)
-                meals =unpack_meals(meal.id)
+                half_time = 'am'
+                if hour >12:
+                    hour = hour -12
+                    half_time = 'pm'
+                else:
+                    hour = hour
+                    half_time = 'am'
+                meals_unpacked =unpack_meals(meal.id)
              
-            print(f"ID: {meal.id}, Meal name: {meal.name}, Date: {date}, Time: {hour}:{minute}")
+            print(f"ID: {meal.id}, Meal name: {meal.name}, Date: {date}, Time: {hour}:{minute} {half_time}, Meals: ({meals_unpacked})")
             #TODO complete
 
 
