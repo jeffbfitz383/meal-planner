@@ -113,13 +113,145 @@ if __name__ == "__main__":
 
 
 ##############Beginning of User Table CRUD functions##################
-#TODO logged in screen
+    
+    def see_meals(id_of_logged_in_user, tier_of_logged_in_user):
+        meals = session.query(Meal).all()
+        for meal in meals:
+            if meal.user.id == id_of_logged_in_user:
+             print(f"{meal.user.name}, {meal.name}")
+            #TODO complete
+    
 
-#TODO log in screen start
+    
+    def update_user(id_of_logged_in_user, tier_of_logged_in_user):
+          
+        in_update = True
+        while in_update == True:
+            print("Make a selection:")
+            print("   Enter 1 to update name: ")
+            print("   Enter 2 to update your user_name: ")
+            print("   Enter 3 to update your password: ")
+            print("   Enter 4 to update your email: ")
+            print("   Enter 5 to exit ")
+            print("   Enter 6 to cancel account: ")
+
+            user_input = input(":")
+            for user in session.query(User):
+                if user.id == id_of_logged_in_user:
+                    if user_input == '5':
+                        in_update = False
+                    elif user_input == '1':
+                        in_loop = True
+                        while in_loop == True:
+
+                            name_input = input("What is your new name?")
+                            if type(name_input) is str and 2<= len(name_input):
+                                user.name = name_input
+                                in_loop = False
+                            else:
+                                print("Name must be text with 2 or more characters")
+
+                    elif user_input == '2':
+                        
+                        in_loop = True
+                        while in_loop == True:
+
+                            user_name_input = input("What is your new  user name?")
+                            if type(user_name_input) is str and 4<= len(user_name_input):
+                                user.user_name = user_name_input
+                                in_loop = False
+                            else:
+                                print("User name must be text with 4 or more characters")
+
+                    
+                    elif user_input == '3':
+                       
+                        in_loop = True
+                        while in_loop == True:
+
+                            password_input = input("What is your new password")
+                            if type(password_input) is str and 8<= len(password_input):
+                                user.password = password_input
+                                in_loop = False
+                            else:
+                                print("password must be text with 8 or more characters")
+
+                    elif user_input == '4':
+                    
+                        in_loop = True
+                        while in_loop == True:
+
+                            email_input = input("What is your new email: ")
+                            if type(email_input) is str and 6<= len(email_input) and '@' in email_input:
+                                user.email = email_input
+                                in_loop = False
+                            else:
+                                print("Email must be text with 6 or more characters and include and @ symbol")
+
+                    elif user_input == '6':
+                        in_update = False
+                        session.delete(user)
+
+            session.commit()
+
+
+
+        
+
+        
+
+        if user_input == '3':
+            update_user_name(id_of_logged_in_user, tier_of_logged_in_user)
+
+    def logged_in(id_of_logged_in_user, tier_of_logged_in_user):
+        
+        logged_in_status = True
+        while logged_in_status == True:
+            print("  Enter 1 to log out: ")
+            print("  Enteer 2 to update info")
+            print("  Enter 3 to see your meals")
+            user_input = input(": ")
+            if user_input == "1":
+                print("come back and see us soon!")
+                logged_in_status = False
+            elif user_input == "2":
+                update_user(id_of_logged_in_user, tier_of_logged_in_user)
+            elif user_input == "3":
+                see_meals(id_of_logged_in_user, tier_of_logged_in_user)
+
+
+        
+        #TODO update personal info
+        #TODO see meals
+        #TODO create meals
+
+        #TODO update food for admin
+        #TODO update users for owner
+
+
     def log_in():
-        pass
-        #TODO add functinality
-#TODO log in screen end
+        at_loggin = True
+        id_of_logged_in_user = 0
+        tier_of_logged_in_user = 0
+        while at_loggin == True:
+            print("\n")
+            user_name = input("please enter your user name to login:")
+            password = input("Please enter your password: ")
+
+      
+
+            query = session.query(User).filter(User.user_name == user_name, password == password).all()
+            if query:
+                for record in query:
+                    id_of_logged_in_user = record.id
+                    tier_of_logged_in_user = record.tier
+                    at_loggin = False
+                    logged_in(id_of_logged_in_user, tier_of_logged_in_user)
+                
+                
+      
+            else:
+                print("password and username missmatch")
 
 
 
@@ -164,7 +296,7 @@ if __name__ == "__main__":
         print(f"Congratulations {name} on becoming a part of the Meal Planner Family!\n")
 
 
-        #TODO complete validations for user.
+       
 
 
 
