@@ -67,6 +67,28 @@ class Meal(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship("User", back_populates="meals")
 
+@validates('name')
+def validate_name(self, key, value):
+    if type(value) is str and 1<= len(value) <30:
+        return value
+    else: ValueError("meal name must be in text for between 1 and 29 characters")
+
+@validates('date')
+def validate_date(self, key, value):
+    if type(value) is int:
+        return value
+    else: ValueError("date type must be and integer")
+
+@validates('time')
+def validate_date(self, key, value):
+    if type(value) is int and 0 <= len(value) <= 1440:
+        return value
+    else: ValueError("date type must be an integer between 0 and 1440")
+
+
+
+
+
 
 
     #TODO validations
@@ -120,6 +142,32 @@ if __name__ == "__main__":
             for food in sorted_foods_descending:
                 print(f"ID: {food.id}, Name: {food.name}, % daily protein: {food.percent_protein}% daily Calcium: {food.percent_calcium}")
 
+    def week_sort(id_of_logged_in_user, date):
+        week_total_calcium = 0
+        week_total_protein = 0
+        greatest_deficiency_week = 0
+
+
+        week_back = date -7
+        print(date)
+        print(week_back)
+        meals = session.query(Meal).all()
+        for meal in meals:
+            if week_back <= meal.date < date and meal.user_id == id_of_logged_in_user:
+                for food in meal.foods:
+                    print(food.name)
+                    week_total_calcium = week_total_calcium + food.percent_calcium
+                    week_total_protein = week_total_protein + food.percent_protein
+        if week_total_calcium >= week_total_protein:
+            greatest_deficiency_week = 2
+            print("your greatest deficiency for the week is protein")
+        else:
+            greatest_deficiency_week = 1
+            primt("Your greatest deficiency for the week is calcium")
+        sort_foods(greatest_deficiency_week, id_of_logged_in_user)
+            
+
+
 
 
     def unpack_meals(meal_id):
@@ -148,9 +196,10 @@ if __name__ == "__main__":
 
                 print(f"Showing meals for user {user.name}")
         meals = session.query(Meal).all()
+
         
         for meal in meals:
-
+       
             if meal.user.id == id_of_logged_in_user:
                 date = unpack_date(meal.date)
                 hour = int(meal.time/60)
@@ -164,7 +213,7 @@ if __name__ == "__main__":
                     half_time = 'am'
                 meals_unpacked =unpack_meals(meal.id)
              
-            print(f"ID: {meal.id}, Meal name: {meal.name}, Date: {date}, Time: {hour}:{minute} {half_time}, Meals: ({meals_unpacked})")
+                print(f"ID: {meal.id}, Meal name: {meal.name}, Date: {date}, Time: {hour}:{minute} {half_time}, Meals: ({meals_unpacked})")
             #TODO complete
 
     def delete_meal(id_of_logged_in_user, tier_of_logged_in_user):
@@ -229,7 +278,8 @@ if __name__ == "__main__":
                     food_loop = False
                 else:
                     if one_pass == False:
-                        see_foods()
+                        #see_foods()
+                        week_sort(id_of_logged_in_user, date)
                     elif one_pass == True:
                         print("not first pass")
                         sort_foods(greatest_deficiency, id_of_logged_in_user)
@@ -434,6 +484,11 @@ if __name__ == "__main__":
 
             session.commit()
 
+    def view_users(id_of_logged_in_user, tier_of_logged_in_user):
+        print("\n")
+        
+        for user in session.query(User).all():
+            print(f"ID: {user.id}, Name: {user.name}, Email: {user.email}, Tier: {user.tier}\n")
 
 
         
@@ -449,11 +504,14 @@ if __name__ == "__main__":
             print("  Enteer 2 to update info")
             print("  Enter 3 to see your meals")
             print("  Enter 4 to create a new meal")
-            if tier_of_logged_in_user == 3:
+            if tier_of_logged_in_user >1:
                 print("  Enter 5 to update food: ")
             print(" Enter 6 to delete a meal: ")
+            if tier_of_logged_in_user >1:
+                print(" Enter 7 to view users")
 
             user_input = input(": ")
+            print("\n")
 
             if user_input == "1":
                 print("come back and see us soon!")
@@ -465,11 +523,14 @@ if __name__ == "__main__":
             elif user_input == '4':
                 create_meal(id_of_logged_in_user, tier_of_logged_in_user)
             
-            elif user_input == '5' and tier_of_logged_in_user ==3:
+            elif user_input == '5' and tier_of_logged_in_user >1:
                 update_foods(id_of_logged_in_user, tier_of_logged_in_user)
 
             elif user_input == '6':
                 delete_meal(id_of_logged_in_user, tier_of_logged_in_user)
+            elif user_input == '7' and tier_of_logged_in_user >1:
+                view_users(id_of_logged_in_user, tier_of_logged_in_user)
+
             
 
 
@@ -543,7 +604,7 @@ if __name__ == "__main__":
             else:
                 print("passwords must be atleast 8 characters")
 
-        new_user = User(name=name, user_name=user_name, password=password, email=email, tier=3 )
+        new_user = User(name=name, user_name=user_name, password=password, email=email, tier=1 )
         session.add(new_user)
         session.commit()
 
