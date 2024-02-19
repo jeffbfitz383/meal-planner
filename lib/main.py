@@ -102,6 +102,12 @@ if __name__ == "__main__":
    
 
 ##############start of create meals CRUD functions#############
+
+    def see_foods():
+        foods = session.query(Food).all()
+        for food in foods:
+            print(f"ID: {food.id}, Name: {food.name}, % daily protein: {food.percent_protein}% daily Calcium: {food.percent_calcium}")
+
     def unpack_meals(meal_id):
         all = []
 
@@ -180,6 +186,7 @@ if __name__ == "__main__":
                 if user_input == '2':
                     food_loop = False
                 else:
+                    see_foods()
                     print("Please enter the item # of the food you would like to add: ")
                     food_input = input(": ")
                     int_food = int(food_input)
@@ -223,6 +230,19 @@ if __name__ == "__main__":
 #TODO Meal table CRUD functions
 ###############Beginning of Food Crud functions################
 
+    def delete_food():
+        see_foods()
+        print("\n")
+        user_input= input("Please select the id of the food you would like to delete")
+        int_id = int(user_input)
+
+        for food in session.query(Food):
+            if food.id == int_id:
+                session.delete(food)
+        session.commit()
+        
+
+
 
     def create_new_food():
         name_loop = True
@@ -260,16 +280,19 @@ if __name__ == "__main__":
         while in_update_foods == True:
 
             print("  Enter 1 to go back to previous menu: ")
-            print("  Enter 2 to create a new food")
+            print("  Enter 2 to create a new food: ") 
+            print("  Enter 4 to delte a food: ")
 
 
             user_input = input(": ")
             if user_input == '1':
                 in_update_foods =False
-            if user_input == '2':
+            elif user_input == '2':
                 create_new_food()
+            elif user_input == '4':
+                delete_food()
 
- #TODO see foods
+
  #TODO update food info
  #TODO delet food
 
