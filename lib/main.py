@@ -49,7 +49,7 @@ class User(Base):
     
 
 
-    ##TODO complete validations
+
 
 
 meal_food_table = Table('meal_food', Base.metadata,
@@ -136,11 +136,7 @@ if __name__ == "__main__":
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    #Owen =User(name = "Owen", email = "Owen@Minecraft.com", user_name = "1", password = "1", tier = 3)
-    
-   # Riley =User(name = "Riley", email = "Riley@bb.com", user_name = "1", password = "1", tier = 3)
-    #session.add(Owen)
-   # session.commit()
+
 
    
 
@@ -150,9 +146,10 @@ if __name__ == "__main__":
     def see_foods():
         foods = session.query(Food).all()
         for food in foods:
-            print(f"ID: {food.id}, Name: {food.name}, % daily protein: {food.percent_protein}% daily Calcium: {food.percent_calcium}")
+            print(f"ID: {food.id}, Name: {food.name}, % daily protein: {food.percent_protein}% daily Calcium: {food.percent_calcium}")  #prints all foods
 
-    def sort_foods(greatest_deficiency, id_of_logged_in_user):
+    def sort_foods(greatest_deficiency, id_of_logged_in_user):             ## sorts in descending by calium and protein
+        print("\n")
         foods = session.query(Food).all()
         if greatest_deficiency == 1:
             sorted_foods_descending = sorted(foods, key=lambda x: x.percent_calcium, reverse=True)
@@ -162,36 +159,37 @@ if __name__ == "__main__":
             sorted_foods_descending = sorted(foods, key=lambda x: x.percent_protein, reverse=True)
             for food in sorted_foods_descending:
                 print(f"ID: {food.id}, Name: {food.name}, % daily protein: {food.percent_protein}% daily Calcium: {food.percent_calcium}")
+                print("\n")
 
-    def week_sort(id_of_logged_in_user, date):
+    def week_sort(id_of_logged_in_user, date):      #start count for weekely total
         week_total_calcium = 0
         week_total_protein = 0
         greatest_deficiency_week = 0
 
 
-        week_back = date -7
-        print(date)
-        print(week_back)
+        week_back = date -7                         # goes back a day before current day
+        #print(date)
+        #print(week_back)
         meals = session.query(Meal).all()
         for meal in meals:
-            if week_back <= meal.date < date and meal.user_id == id_of_logged_in_user:
+            if week_back <= meal.date < date and meal.user_id == id_of_logged_in_user:      # gets all 7 days
                 for food in meal.foods:
                     print(food.name)
-                    week_total_calcium = week_total_calcium + food.percent_calcium
+                    week_total_calcium = week_total_calcium + food.percent_calcium          # adds to total
                     week_total_protein = week_total_protein + food.percent_protein
-        if week_total_calcium >= week_total_protein:
+        if week_total_calcium >= week_total_protein:                                        # entire loop identifies which is greater
             greatest_deficiency_week = 2
             print("your greatest deficiency for the week is protein")
         else:
             greatest_deficiency_week = 1
-            primt("Your greatest deficiency for the week is calcium")
+            print("Your greatest deficiency for the week is calcium")
         sort_foods(greatest_deficiency_week, id_of_logged_in_user)
-            
+        print("\n")   
 
 
 
 
-    def unpack_meals(meal_id):
+    def unpack_meals(meal_id):                          # converts all meals under meal id to array and then a comma sperated string
         all = []
 
         meals = session.query(Meal).all()
@@ -202,7 +200,7 @@ if __name__ == "__main__":
         comma_separated_string = ", ".join(all)
         return comma_separated_string
 
-    def unpack_date(date):
+    def unpack_date(date):                                                # converts epoch date to date
         days_since_epoch = 19773
         epoch_date = datetime.datetime(1970, 1, 1)
         target_date = epoch_date + datetime.timedelta(days=days_since_epoch)
@@ -210,7 +208,7 @@ if __name__ == "__main__":
         return formatted_date
         
 
-    def see_meals(id_of_logged_in_user, tier_of_logged_in_user):
+    def see_meals(id_of_logged_in_user, tier_of_logged_in_user):            # prints an table for all meals of a particular user
         users = session.query(User).all()
         for user in users:
             if user.id == id_of_logged_in_user:
@@ -237,7 +235,7 @@ if __name__ == "__main__":
                 print(f"ID: {meal.id}, Meal name: {meal.name}, Date: {date}, Time: {hour}:{minute} {half_time}, Meals: ({meals_unpacked})")
             #TODO complete
 
-    def delete_meal(id_of_logged_in_user, tier_of_logged_in_user):
+    def delete_meal(id_of_logged_in_user, tier_of_logged_in_user):          # user can delete one of their meals
 
         print("Enter the ID# of the meal you would like to delete")
         see_meals(id_of_logged_in_user, tier_of_logged_in_user)
@@ -249,14 +247,14 @@ if __name__ == "__main__":
                 session.delete(meal)
         session.commit()
 
-    def add_protein(int_food):
+    def add_protein(int_food):                                       # determines how much protein to add every time a food is added to a meal 
         foods = session.query(Food).all()
         for food in foods:
             if food.id == int_food:
                 return food.percent_protein
 
     def add_calcium(int_food):
-        foods = session.query(Food).all()
+        foods = session.query(Food).all()                            # determines how much calcium to add
         for food in foods:
             if food.id == int_food:
                 return food.percent_calcium
@@ -292,14 +290,14 @@ if __name__ == "__main__":
                 meal.date = date
                 meal.time = time
 
-                all = []
+                all = []                                                                   # prints all meals
                 for meal in session.query(Meal):
                     if meal.id == int(user_input):
                         for food in meal.foods:
                             all.append(food.name)
                 print(all)
 
-                food_to_remove = input("please enter the food to remove or hit enter to skip:")
+                food_to_remove = input("please enter the food to remove or hit enter to skip:")   # add and delete foods to an existing meal
                 meal.foods = [food for food in meal.foods if food.name != food_to_remove]
 
                 foods = session.query(Food).all()
@@ -360,7 +358,7 @@ if __name__ == "__main__":
                 print("press 1 to add a food to your meal")
                 print("Press 2 to submit meal")
                 user_input = input(": ")
-                if user_input == '2':
+                if user_input == '2':                                     # determines whethor the first meal has been added
                     food_loop = False
                 else:
                     if one_pass == False:
@@ -392,15 +390,7 @@ if __name__ == "__main__":
 
 
             
-            #food = session.get(Food, 1)
-            #new_meal.foods.append(food)
-            #session.commit()
 
-            #print(f"{date}, {time}")
-            #meal = session.get(Meal, 2)
-
-            #food_names = [food.name for food in meal.foods]
-            #print(food_names[0])
 
                 in_create_meal = False
             
@@ -413,10 +403,7 @@ if __name__ == "__main__":
     #dinner = Meal(name= "Dinner", date =50, time =50, foods = "meat", user_id = 1 )
     #session.add_all([breakfast, lunch, dinner])
     #session.commit()
-#to do print
-   # meals = session.query(Meal).all()
-   # for meal in meals:
-   #     print(f"{meal.name} - User: {meal.user.name}")
+
 
 
 
@@ -628,7 +615,7 @@ if __name__ == "__main__":
         
 
         
-    def logged_in(id_of_logged_in_user, tier_of_logged_in_user):
+    def logged_in(id_of_logged_in_user, tier_of_logged_in_user):  #logged in option menu
         
         logged_in_status = True
         while logged_in_status == True:
@@ -672,10 +659,7 @@ if __name__ == "__main__":
 
   
 
-        #TODO create meals -add exended deliverables
 
-        #TODO update food for admin
-        #TODO update users for owner
 
 
     def log_in():
