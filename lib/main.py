@@ -534,8 +534,7 @@ if __name__ == "__main__":
                 print("enter valid input: ")
 
 
- #TODO update food info
- #TODO delet food
+
 
 
 
