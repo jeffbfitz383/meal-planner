@@ -67,31 +67,31 @@ class Meal(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship("User", back_populates="meals")
 
-@validates('name')
-def validate_name(self, key, value):
-    if type(value) is str and 1<= len(value) <30:
-        return value
-    else: ValueError("meal name must be in text for between 1 and 29 characters")
+    @validates('name')
+    def validate_name(self, key, value):
+        if type(value) is str and 1<= len(value) <30:
+            return value
+        else: ValueError("meal name must be in text for between 1 and 29 characters")
 
-@validates('date')
-def validate_date(self, key, value):
-    if type(value) is int:
-        return value
-    else: ValueError("date type must be and integer")
+    @validates('date')
+    def validate_date(self, key, value):
+        if type(value) is int:
+            return value
+        else: ValueError("date type must be and integer")
 
-@validates('time')
-def validate_date(self, key, value):
-    if type(value) is int and 0 <= len(value) <= 1440:
-        return value
-    else: ValueError("date type must be an integer between 0 and 1440")
-
-
+    @validates('time')
+    def validate_date(self, key, value):
+        if type(value) is int and 0 <= value <= 1440:
+            return value
+        else: ValueError("date type must be an integer between 0 and 1440")
 
 
 
 
 
-    #TODO validations
+
+
+
     
     
 
@@ -104,7 +104,28 @@ class Food(Base):
     meals = relationship("Meal", secondary=meal_food_table, back_populates="foods")
     meal_id = Column(Integer, ForeignKey('meals.id'))
 
-    #TODO validations
+    @validates('name')
+    def validate_name(self, key, value):
+        if type(value) is string and 1<= len(value) <= 30:
+            return value
+        else: ValueError("name must be of type test between 1 and 30 character inclusive")
+
+    @validates('percent_protein')
+    def validate_percent_protein(self, key, value):
+        if type(value) is int and 0<= value <= 100:
+            return value
+        else: ValueError("percent_protein must int ranging from 0 to 100")
+
+    @validates('percent_calcium')
+    def validate_percent_calcium(self, key, value):
+        if type(value) is int and 0<= value <= 100:
+            return value
+        else: ValueError("percent_calcium must be must be int from 0 to 100")
+
+    
+
+
+    
 
 if __name__ == "__main__":
     engine = create_engine('sqlite:///planner.db')
