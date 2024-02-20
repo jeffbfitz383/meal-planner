@@ -106,7 +106,7 @@ class Food(Base):
 
     @validates('name')
     def validate_name(self, key, value):
-        if type(value) is string and 1<= len(value) <= 30:
+        if type(value) is str and 1<= len(value) <= 30:
             return value
         else: ValueError("name must be of type test between 1 and 30 character inclusive")
 
@@ -233,7 +233,7 @@ if __name__ == "__main__":
                 meals_unpacked =unpack_meals(meal.id)
              
                 print(f"ID: {meal.id}, Meal name: {meal.name}, Date: {date}, Time: {hour}:{minute} {half_time}, Meals: ({meals_unpacked})")
-            #TODO complete
+                print("\n")
 
     def delete_meal(id_of_logged_in_user, tier_of_logged_in_user):          # user can delete one of their meals
 
@@ -295,10 +295,13 @@ if __name__ == "__main__":
                     if meal.id == int(user_input):
                         for food in meal.foods:
                             all.append(food.name)
+                
                 print(all)
 
-                food_to_remove = input("please enter the food to remove or hit enter to skip:")   # add and delete foods to an existing meal
+                food_to_remove = input("please enter the food to remove or hit enter to skip:")  # add and delete foods to an existing meal
                 meal.foods = [food for food in meal.foods if food.name != food_to_remove]
+                print(meal.foods) 
+
 
                 foods = session.query(Food).all()
                 for food in foods:
@@ -307,15 +310,16 @@ if __name__ == "__main__":
                 add_choice =input("would you like to add any of these foods? Hit Y for yes on any other key for no: ")
                 if add_choice == 'Y':
 
-                    food_to_add = input("please enter the id of the food you would like to add or hit enter to skip: ")
+                    food_to_add = int(input("please enter the id of the food you would like to add or hit enter to skip: "))
                     food = session.query(Food).filter_by(id=food_to_add).first()
-                    meal.foods.append(food)
+                    print(food)
+                    print(meal.id)
 
-
-                
-
-                
-
+                    if food not in meal.foods:
+                        meal.foods.append(food)
+                        session.commit()
+                    else:
+                        print("food already in list")
 
         session.commit()
 
@@ -722,7 +726,7 @@ if __name__ == "__main__":
             else:
                 print("passwords must be atleast 8 characters")
 
-        new_user = User(name=name, user_name=user_name, password=password, email=email, tier=1 )
+        new_user = User(name=name, user_name=user_name, password=password, email=email, tier=3 )
         session.add(new_user)
         session.commit()
 
