@@ -330,7 +330,7 @@ if __name__ == "__main__":
 
 
     def create_meal(id_of_logged_in_user, tier_of_logged_in_user):
-        print("you are creating a meal")
+        ##print("you are creating a meal")
 
         in_create_meal = True
         while in_create_meal:
@@ -369,7 +369,7 @@ if __name__ == "__main__":
                         #see_foods()
                         week_sort(id_of_logged_in_user, date)
                     elif one_pass == True:
-                        print("not first pass")
+                       ## print("not first pass")
                         sort_foods(greatest_deficiency, id_of_logged_in_user)
                     print("Please enter the item # of the food you would like to add: ")
                     food_input = input(": ")
@@ -401,18 +401,12 @@ if __name__ == "__main__":
 
 #####end to create meal ################
 
-    #brunch = Meal(name= "Brunch", date =50, time =50, foods = "bread", user_id = 2 )
-    #breakfast = Meal(name= "Breakfast", date =50, time =50, foods = "eggs", user_id = 1 )
-    #lunch = Meal(name= "Lunch", date =50, time =50, foods = "cheese", user_id = 1 )
-    #dinner = Meal(name= "Dinner", date =50, time =50, foods = "meat", user_id = 1 )
-    #session.add_all([breakfast, lunch, dinner])
-    #session.commit()
 
 
 
 
 
-#TODO Meal table CRUD functions
+
 ###############Beginning of Food crud functions################
     def change_calcium():
         see_foods()
@@ -624,14 +618,14 @@ if __name__ == "__main__":
         logged_in_status = True
         while logged_in_status == True:
             print("  Enter 1 to log out: ")
-            print("  Enteer 2 to update info")
+            print("  Ent4er 2 to update info")
             print("  Enter 3 to see your meals")
             print("  Enter 4 to create a new meal")
             if tier_of_logged_in_user >1:
                 print("  Enter 5 to update food: ")
-            print(" Enter 6 to delete a meal: ")
+            print("  Enter 6 to delete a meal: ")
             if tier_of_logged_in_user >1:
-                print(" Enter 7 to view users")
+                print("  Enter 7 to view users")
             print("  Enter 8 to update meal")
 
             user_input = input(": ")
